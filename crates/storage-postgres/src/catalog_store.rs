@@ -422,3 +422,10 @@ impl extenddb_storage::management_store::RateLimitStore for PostgresCatalogStore
         })
     }
 }
+
+// Implement CatalogStore supertrait
+impl extenddb_storage::CatalogStore for PostgresCatalogStore {
+    fn cached_encryption_key(&self) -> Option<String> {
+        self.encryption_key.as_ref().map(|arc| arc.to_string())
+    }
+}
