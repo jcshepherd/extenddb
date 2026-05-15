@@ -165,6 +165,44 @@ pub(crate) fn deserialize_error(e: serde_json::Error) -> DynamoDbError {
         ))
     }
 }
+
+/// Pre-validate enum fields in a JSON body and return a combined error if multiple are invalid.
+///
+/// DynamoDB reports all invalid enum fields together rather than stopping at the first.
+/// Each entry is `(json_field_name, api_field_name, valid_values)`.
+pub(crate) fn validate_enum_fields(
+    body: &serde_json::Value,
+    fields: &[(&str, &str, &[&str])],
+) -> Result<(), DynamoDbError> {
+    let obj = match body.as_object() {
+        Some(o) => o,
+        None => return Ok(()),
+    };
+    let mut errors: Vec<String> = Vec::new();
+    for &(json_name, api_name, valid) in fields {
+        if let Some(val) = obj.get(json_name) {
+            if let Some(s) = val.as_str() {
+                if !valid.contains(&s) {
+                    errors.push(format!(
+                        "Value '{s}' at '{api_name}' failed to satisfy constraint: \
+                         Member must satisfy enum value set: [{}]",
+                        valid.join(", ")
+                    ));
+                }
+            }
+        }
+    }
+    if errors.is_empty() {
+        return Ok(());
+    }
+    let count = errors.len();
+    let msg = format!(
+        "{count} validation error{} detected: {}",
+        if count == 1 { "" } else { "s" },
+        errors.join("; ")
+    );
+    Err(DynamoDbError::ValidationException(msg))
+}
 ///
 /// Populated by engine handlers so the server layer can record capacity,
 /// returned item counts, and returned byte counts without parsing the JSON

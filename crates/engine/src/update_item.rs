@@ -42,6 +42,10 @@ pub async fn handle_update_item<S: TableEngine + DataEngine>(
     body: Value,
     ctx: &OperationContext<S>,
 ) -> Result<DispatchResult, DynamoDbError> {
+    crate::validate_enum_fields(&body, &[
+        ("ReturnValues", "returnValues", &["NONE", "ALL_OLD", "ALL_NEW", "UPDATED_OLD", "UPDATED_NEW"]),
+        ("ReturnConsumedCapacity", "returnConsumedCapacity", &["INDEXES", "TOTAL", "NONE"]),
+    ])?;
     let input: UpdateItemInput = serde_json::from_value(body).map_err(crate::deserialize_error)?;
 
     extenddb_core::validation::validate_table_name(&input.table_name, &ctx.limits)?;
