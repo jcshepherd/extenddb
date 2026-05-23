@@ -1,7 +1,7 @@
 # RFCs
 
 Substantial changes go through the RFC process before implementation.
-ADRs ([`docs/adr/`](../docs/adr/)) record decisions; RFCs solicit input on
+ADRs ([`docs/adr/`](../adr/)) record decisions; RFCs solicit input on
 proposals.
 
 ## When an RFC is required
@@ -25,13 +25,13 @@ you whether an RFC, an ADR, or neither is needed.
 
 ## Process
 
-1. **Draft.** Copy `0000-template.md` to `rfcs/0000-my-proposal.md` (keep `0000`
+1. **Draft.** Copy `0000-template.md` to `docs/rfcs/0000-my-proposal.md` (keep `0000`
    until accepted). Open a PR. The PR is the discussion thread for now —
    if conversations grow long enough that the PR becomes hard to follow, a
    maintainer may move the broad design debate to GitHub Discussions and
    reserve the PR for line-level comments.
 2. **Under Review.** A maintainer assigns reviewers from
-   [`.github/CODEOWNERS`](../.github/CODEOWNERS): at minimum two maintainers,
+   [`.github/CODEOWNERS`](../../.github/CODEOWNERS): at minimum two maintainers,
    including at least one code owner for each surface the RFC affects.
    Discussion happens inline on the PR.
 3. **Final Comment Period (FCP).** When reviewers are aligned, a maintainer
@@ -42,7 +42,7 @@ you whether an RFC, an ADR, or neither is needed.
    resets the FCP clock by another 7 days.
 4. **Accepted.** The PR is merged with a real number assigned by the maintainer
    (next unused `NNNN`). Implementation PRs reference the RFC by number.
-5. **Rejected or Withdrawn.** Merged into `rfcs/` with `Status: Rejected` or
+5. **Rejected or Withdrawn.** Merged into `docs/rfcs/` with `Status: Rejected` or
    `Status: Withdrawn` so the rationale is preserved for future contributors.
 
 ## Index

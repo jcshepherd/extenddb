@@ -54,10 +54,10 @@ ExtendDB uses two lightweight processes to keep core decisions reviewable:
   made, in four sections: Context, Options Considered, Decision, Consequences.
   Use for narrower, internal calls (for example, "we chose `ring` over
   `openssl`" or "ADRs live in `docs/adr/`").
-- **RFC** ([`rfcs/`](rfcs/)) — proposes a change *before* it is made and
+- **RFC** ([`docs/rfcs/`](docs/rfcs/)) — proposes a change *before* it is made and
   invites a comment period. Use for changes to the wire protocol, the
   `Storage` trait, the auth model, on-disk format, or the public CLI surface.
-  See [`rfcs/README.md`](rfcs/README.md) for the lifecycle.
+  See [`docs/rfcs/README.md`](docs/rfcs/README.md) for the lifecycle.
 
 If you are not sure which to write, open an issue describing the change. A
 maintainer will tell you which path fits.

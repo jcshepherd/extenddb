@@ -203,7 +203,7 @@ test, and code-style requirements.
 ExtendDB uses two lightweight processes for tracking decisions:
 
 - **[ADRs](docs/adr/README.md)** record decisions that have been made.
-- **[RFCs](rfcs/README.md)** propose changes that affect the wire protocol,
+- **[RFCs](docs/rfcs/README.md)** propose changes that affect the wire protocol,
   storage trait, auth model, on-disk format, public CLI, or any significant
   new feature or subsystem. Substantial changes go through an RFC before
   implementation.

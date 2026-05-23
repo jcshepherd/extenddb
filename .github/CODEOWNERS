@@ -27,6 +27,6 @@ crates/bin/                    @amrith @c33howard @jcshepherd @pdf-amzn
 
 # Process & governance documents.
 docs/adr/                      @amrith @c33howard @jcshepherd @pdf-amzn
-rfcs/                          @amrith @c33howard @jcshepherd @pdf-amzn
+docs/rfcs/                     @amrith @c33howard @jcshepherd @pdf-amzn
 CONTRIBUTING.md                @amrith @c33howard @jcshepherd @pdf-amzn
 .github/                       @amrith @c33howard @jcshepherd @pdf-amzn

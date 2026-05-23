@@ -12,7 +12,7 @@ Write an ADR when you make a decision that:
 - Affects more than one component or cuts across crates
 
 ADRs are *records*, not proposals. If you are still soliciting input, write an
-[RFC](../../rfcs/README.md) instead.
+[RFC](../rfcs/README.md) instead.
 
 ## Process
 
