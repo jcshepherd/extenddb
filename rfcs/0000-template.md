@@ -22,6 +22,9 @@ The bulk of the RFC. Cover:
 - API or wire-format changes, with concrete request/response examples
 - Behavioral changes
 - Migration path for existing users
+- New operational requirements — anything an operator needs to learn,
+  configure, monitor, or run differently after this lands (new daemons,
+  ports, config keys, metrics, runbooks, dependencies)
 - Implementation sketch — which crates change, in what order
 
 ## Drawbacks
