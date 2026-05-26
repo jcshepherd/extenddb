@@ -96,11 +96,7 @@ impl PostgresBootstrapper {
 
         format!(
             "postgresql://{}:{}@{}:{}/{}",
-            user_encoded,
-            pass_encoded,
-            host_encoded,
-            self.config.port,
-            db_encoded,
+            user_encoded, pass_encoded, host_encoded, self.config.port, db_encoded,
         )
     }
 
@@ -617,7 +613,6 @@ fn extract_arg(args: &[String], flag: &str) -> Option<String> {
     args.windows(2).find(|w| w[0] == flag).map(|w| w[1].clone())
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -702,7 +697,8 @@ mod tests {
         let url = bootstrapper.catalog_connection_url();
 
         // Should parse without error
-        let opts = url.parse::<sqlx::postgres::PgConnectOptions>()
+        let opts = url
+            .parse::<sqlx::postgres::PgConnectOptions>()
             .expect("Generated URL should parse");
 
         // Verify parsed values match original config
@@ -728,7 +724,8 @@ mod tests {
         let url = bootstrapper.catalog_connection_url();
 
         // Should parse without error - this is the key test
-        let opts = url.parse::<sqlx::postgres::PgConnectOptions>()
+        let opts = url
+            .parse::<sqlx::postgres::PgConnectOptions>()
             .expect("Generated URL should parse");
 
         // Note: sqlx may show "localhost" for get_host() even with a Unix socket path,
