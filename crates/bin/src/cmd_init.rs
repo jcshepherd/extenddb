@@ -44,6 +44,22 @@ pub struct InitArgs {
     #[arg(long)]
     pg_pass: Option<String>,
 
+    /// Cassandra contact points (comma-separated host:port)
+    #[arg(long)]
+    cassandra_contact_points: Option<String>,
+
+    /// Cassandra admin user (for CREATE ROLE)
+    #[arg(long)]
+    cassandra_user: Option<String>,
+
+    /// Cassandra admin password
+    #[arg(long)]
+    cassandra_pass: Option<String>,
+
+    /// Cassandra keyspace prefix
+    #[arg(long)]
+    keyspace_prefix: Option<String>,
+
     /// extenddb application user
     #[arg(long)]
     extenddb_user: Option<String>,
@@ -255,13 +271,19 @@ pub async fn run(args: InitArgs) -> anyhow::Result<u8> {
     }
 
     // Generate or update extenddb.toml.
-    let catalog_url = bootstrapper.catalog_connection_url();
+    let backend = args.backend.as_deref().unwrap_or("postgres");
     let config_path = &args.config;
 
     if Path::new(config_path).exists() {
         std::fs::remove_file(config_path)?;
     }
-    generate_config(config_path, &catalog_url, &bind_addr, docs_dir.as_deref())?;
+    generate_config(
+        config_path,
+        backend,
+        bootstrapper.as_ref(),
+        &bind_addr,
+        docs_dir.as_deref(),
+    )?;
 
     println!(
         "\n=== extenddb init complete ===\nStart the server with: extenddb serve --config {config_path}"

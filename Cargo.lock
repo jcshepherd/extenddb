@@ -839,21 +839,17 @@ dependencies = [
 name = "extenddb"
 version = "0.1.0"
 dependencies = [
- "aes-gcm",
  "anyhow",
  "base64 0.22.1",
- "bcrypt",
  "clap",
  "config",
  "daemonize",
- "extenddb-auth",
  "extenddb-core",
  "extenddb-engine",
  "extenddb-server",
  "extenddb-storage",
  "extenddb-storage-postgres",
  "libc",
- "rand 0.9.4",
  "rcgen",
  "rustls",
  "rustls-pemfile",
@@ -952,16 +948,20 @@ dependencies = [
 name = "extenddb-storage"
 version = "0.1.0"
 dependencies = [
+ "aes-gcm",
  "async-trait",
  "base64 0.22.1",
+ "bcrypt",
  "bigdecimal",
  "extenddb-auth",
  "extenddb-core",
  "futures",
  "inventory",
+ "rand 0.9.4",
  "serde_json",
  "thiserror 2.0.18",
  "time",
+ "tokio",
  "toml",
  "tracing",
  "tracing-subscriber",
