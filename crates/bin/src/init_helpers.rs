@@ -129,6 +129,16 @@ key_path = "{tls_key}"
 [auth]
 # provider = "builtin"           # SigV4 with local credential store (mandatory)
 
+[auth.cache]
+# In-memory caches eliminate per-request catalog queries for IAM data.
+# Defaults: ttl 60s, soft_ttl 30s, negative_ttl 5s, max 10000 entries/cache.
+# Set enabled = false to disable all caches (for incident response).
+# enabled = true
+# ttl_seconds = 60
+# soft_ttl_seconds = 30
+# negative_ttl_seconds = 5
+# max_entries = 10000
+
 [logging]
 # level = "info"                 # trace, debug, info, warn, error
 # format = "pretty"              # "pretty" (human) or "json" (structured)
