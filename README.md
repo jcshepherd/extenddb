@@ -49,7 +49,7 @@ scripts/install-macos.sh   # macOS
 
 ## Prerequisites
 
-- Rust 1.85+ (`rustup update`)
+- Rust 1.88+ (`rustup update`)
 - PostgreSQL 14+ (see `docs/local-postgres-setup.md`)
 - Python 3.10+ (for test suites and documentation)
 
