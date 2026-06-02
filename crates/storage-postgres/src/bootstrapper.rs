@@ -576,28 +576,6 @@ impl PostgresBootstrapper {
     }
 }
 
-/// Check that a CLI arg, if provided, matches the config value.
-fn check_conflict<T: PartialEq + std::fmt::Display>(
-    cli_val: Option<&T>,
-    config_val: &T,
-    flag: &str,
-) -> Result<(), extenddb_storage::error::StorageError> {
-    if let Some(v) = cli_val {
-        if v != config_val {
-            return Err(extenddb_storage::error::StorageError::Internal(format!(
-                "{} value '{}' conflicts with config file value '{}'",
-                flag, v, config_val
-            )));
-        }
-    }
-    Ok(())
-}
-
-/// Extract a CLI argument value by flag name.
-fn extract_arg(args: &[String], flag: &str) -> Option<String> {
-    args.windows(2).find(|w| w[0] == flag).map(|w| w[1].clone())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
