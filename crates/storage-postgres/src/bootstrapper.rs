@@ -8,7 +8,13 @@
 //! lazily as needed during the bootstrap sequence.
 
 use async_trait::async_trait;
-use extenddb_storage::bootstrapper::{AdminBootstrapResult, BootstrapConfig, Bootstrapper};
+use extenddb_storage::bootstrapper::{
+    AdminBootstrapResult, BootstrapConfig, Bootstrapper,
+    helpers::{
+        check_conflict, extract_arg, generate_account_id, generate_encryption_key,
+        generate_random_password, hash_password_async,
+    },
+};
 use extenddb_storage::management_store::{OpError, OpResult};
 use sqlx::PgPool;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
@@ -229,9 +235,6 @@ impl Bootstrapper for PostgresBootstrapper {
     }
 
     async fn bootstrap_encryption_key(&self) -> OpResult<()> {
-        use aes_gcm::KeyInit;
-        use base64::Engine;
-
         let pool = self.app_pool(&self.config.catalog_db).await?;
         let exists: bool = sqlx::query_scalar(
             "SELECT EXISTS(SELECT 1 FROM settings WHERE key = 'encryption_key')",
@@ -246,8 +249,7 @@ impl Bootstrapper for PostgresBootstrapper {
         }
 
         println!("--- Generating AES-256-GCM encryption key...");
-        let key = aes_gcm::Aes256Gcm::generate_key(&mut aes_gcm::aead::OsRng);
-        let key_b64 = base64::engine::general_purpose::STANDARD.encode(key);
+        let key_b64 = generate_encryption_key();
 
         sqlx::query(
             "INSERT INTO settings (key, value) VALUES ('encryption_key', $1) \
@@ -320,12 +322,7 @@ impl Bootstrapper for PostgresBootstrapper {
             Some(p) if !p.is_empty() => (p.to_owned(), true),
             _ => (generate_random_password(), false),
         };
-        let pw_clone = password.clone();
-        let hash =
-            tokio::task::spawn_blocking(move || bcrypt::hash(pw_clone, bcrypt::DEFAULT_COST))
-                .await
-                .map_err(|e| OpError::Internal(format!("bcrypt hash task failed: {e}")))?
-                .map_err(|e| OpError::Internal(format!("bcrypt hash failed: {e}")))?;
+        let hash = hash_password_async(password.clone()).await?;
 
         sqlx::query(
             "INSERT INTO admin_users (admin_name, password_hash) VALUES ($1, $2) \
@@ -431,6 +428,16 @@ impl Bootstrapper for PostgresBootstrapper {
     fn catalog_connection_url(&self) -> String {
         self.app_connection_url(&self.config.catalog_db)
     }
+
+    fn generate_backend_config_section(&self) -> String {
+        format!(
+            r#"[storage.postgres]
+connection_string = "{}"
+# pool_size = 20                 # Max connections for data operations (default 20, min 10)
+# catalog_pool_size =            # Max connections for management/catalog ops (defaults to pool_size, min 10)"#,
+            self.catalog_connection_url()
+        )
+    }
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────
@@ -459,28 +466,6 @@ async fn create_database(pool: &PgPool, name: &str, owner: &str) -> OpResult<()>
         .map_err(|e| OpError::Internal(format!("Create database '{name}': {e}")))?;
     println!("    Created.");
     Ok(())
-}
-
-/// Generate a random 12-digit numeric account ID (matches AWS account ID format).
-fn generate_account_id() -> String {
-    use rand::Rng;
-    let mut rng = rand::rng();
-    let id: u64 = rng.random_range(100_000_000_000..1_000_000_000_000);
-    id.to_string()
-}
-
-/// Generate a 24-character random password using alphanumeric characters only.
-///
-/// Restricted to `[a-zA-Z0-9]` to avoid URL-encoding issues in form submissions,
-/// shell copy-paste problems, and other contexts where special characters break.
-/// At 24 characters from a 62-char alphabet, entropy is ~143 bits — more than sufficient.
-fn generate_random_password() -> String {
-    use rand::Rng;
-    const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let mut rng = rand::rng();
-    (0..24)
-        .map(|_| CHARSET[rng.random_range(0..CHARSET.len())] as char)
-        .collect()
 }
 
 impl PostgresBootstrapper {
@@ -532,13 +517,13 @@ impl PostgresBootstrapper {
             check_conflict(extenddb_user.as_ref(), &parts.user, "--extenddb-user")?;
             check_conflict(extenddb_pass.as_ref(), &parts.password, "--extenddb-pass")?;
 
-            if let Some(ref cli_catalog) = catalog_db {
-                if cli_catalog != &parts.database {
-                    return Err(StorageError::Internal(format!(
-                        "--catalog-db '{}' conflicts with config file catalog database '{}'",
-                        cli_catalog, parts.database
-                    )));
-                }
+            if let Some(ref cli_catalog) = catalog_db
+                && cli_catalog != &parts.database
+            {
+                return Err(StorageError::Internal(format!(
+                    "--catalog-db '{}' conflicts with config file catalog database '{}'",
+                    cli_catalog, parts.database
+                )));
             }
 
             (

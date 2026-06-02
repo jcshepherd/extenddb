@@ -84,7 +84,7 @@ Example Dockerfile:
 
 ```dockerfile
 # Match rust-version in Cargo.toml
-FROM rust:1.85 AS builder
+FROM rust:1.95 AS builder
 WORKDIR /src
 COPY . .
 RUN cargo build --release
