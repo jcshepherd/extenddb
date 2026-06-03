@@ -30,7 +30,7 @@ software on your behalf. After the script completes, continue from
 ## Prerequisites
 
 - PostgreSQL 14+ running locally (see `docs/local-postgres-setup.md`)
-- Rust toolchain (1.85+)
+- Rust toolchain (1.88+)
 - AWS CLI v2 (for testing)
 - Python 3.10+ with virtual environment (see [Python Environment Setup](../README.md#python-environment-setup) in the README)
 
@@ -90,6 +90,9 @@ For remote PostgreSQL or Aurora, supply the admin password with `--pg-pass`:
 
 When `--pg-pass` is omitted entirely, `extenddb init` connects without a password, relying on
 PostgreSQL peer/ident authentication (works only on localhost via Unix socket).
+
+**Note:** When using Unix socket connections, specify the socket directory with `--pg-host` using an
+absolute path (e.g., `--pg-host /var/run/postgresql`). Relative paths are not supported.
 
 ### Custom bind address
 
